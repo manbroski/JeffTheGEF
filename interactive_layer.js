@@ -2,15 +2,6 @@ function start() {
 	var stage = new Kinetic.Stage("canvas", 500, 500);
 	var main_layer = new Kinetic.Layer();
 	var message_layer = new Kinetic.Layer();
-	
-	//create drop-box with a title
-	var target_box = new Kinetic.Rect({
-		x: 220,
-		y: 240,
-		width: 40,
-		height: 40,
-	});
-	main_layer.add(target_box);
 
 
 	//create caption
@@ -24,13 +15,17 @@ function start() {
 	});
 	main_layer.add(caption);*/
 
+	var protein;
 	//draw image
 	var imageObject = new Image();
 	imageObject.onload = function (){
-		var protein = new Kinetic.Image({
-			x: 150, 
-			y: 150,
-			image: imageObject
+		protein = new Kinetic.Image({
+			x: 100, 
+			y: 100,
+			width: 70,
+			height: 100,
+			image: imageObject,
+			stroke: "green",
 		});
 		main_layer.add(protein);
 		main_layer.add(target_box);
@@ -44,16 +39,25 @@ function start() {
 
 	//create a substrate shape
 	var glucose = new Kinetic.RegularPolygon({
-		x: 200,
-		y: 200,
+		x: 100,
+		y: 50,
 		sides: 6,
-		radius: 12,
+		radius: 6,
 		stroke: "black",
 		fill: "yellow",
-		strokeWidth: 2,
+		strokeWidth: 1,
 		draggable: true 
 	});
-
+	
+	//create drop-box with a title
+	var target_box = new Kinetic.Rect({
+		x: 100 ,
+		y: 100 ,
+		width: 10,
+		height: 10,
+		stroke: "red",
+		strokeWidth: 1,
+	});
 
 	//set pointer cursor for the glucose
 	glucose.on("mouseover", function(){
