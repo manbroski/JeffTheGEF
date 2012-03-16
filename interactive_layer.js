@@ -11,14 +11,16 @@ function main() {
 
 	//create static elements
 	mainLayer.add(bilayer(250,50,30));
-	mainLayer.add(barrelProtein(200,239,40,50,"#62B869"));
+
 
 	//create dynamic elements
 	var glucose = hexagon (10,50,10,"yellow",true);
-	var target_box = rectangle (100,100,20,20,"green",false);
+	var targetBox = rectangle (205,220,20,20,"white",false);
+	var gpcr = barrelProtein(200,239,40,50,"#62B869")
 
 	//add dynamic stuff to the layers
-	mainLayer.add(target_box);
+	mainLayer.add(gpcr);
+	mainLayer.add(targetBox);
 	mainLayer.add(glucose);
 
 	//create stage
@@ -34,15 +36,35 @@ function main() {
 	glucose.on("mouseout", function () {
 		document.body.style.cursor = "default";
 	});
-
+	
+	var levelComplete = false;
+	
 	//detect glucose being dropped
 	glucose.on("dragend", function() {
-		if (glucose.x > target_box.x && glucose.x < target_box.x + target_box.width && glucose.y > target_box.y && glucose.y < target_box.y + target_box.height) {
+		if (glucose.x > targetBox.x && glucose.x < targetBox.x + targetBox.width && glucose.y > targetBox.y && glucose.y < targetBox.y + targetBox.height) {
 			writeMessage(messageLayer, "Good job!");
 			glucose.draggable(false);
+			levelComplete = true;
 		}
-
 	});
+
+	//adding some super simple animation
+	//TODO have an array of boolean states that tells us which parts are done and when we are ready ot animate.
+	var animationIncrement = 3;
+	var finalDestination = 300;
+	stage.onFrame(function(frame){
+		if (levelComplete) {
+			if (gpcr.x < finalDestination) 
+			{
+				gpcr.x += animationIncrement;
+				glucose.x += animationIncrement;
+				targetBox.x += animationIncrement;
+				mainLayer.draw();
+			}
+		}
+		
+	});
+	stage.start();
 	
 }
 
@@ -76,7 +98,9 @@ function bilayer(origin, thickness, curvature) {
 			context.closePath();
 			this.fillStroke();
 		},
-		fill:"#FFDF64"
+		fill:"#FFDF64",
+		stroke: "black",
+		strokeWidth: 1
 	});
 }
 
