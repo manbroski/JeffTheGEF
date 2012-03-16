@@ -7,14 +7,14 @@ function main() {
 	var messageLayer = new Kinetic.Layer();
 
 
-	//TODO: create an automatic image loader	
+	//TODO create an automatic image loader	
 
 	//create static elements
 	mainLayer.add(bilayer(250,50,30));
 	mainLayer.add(barrelProtein(200,239,40,50,"#62B869"));
 
 	//create dynamic elements
-	var glucose = glucose(10,50,10,"yellow",true);
+	var glucose = hexagon (10,50,10,"yellow",true);
 	var target_box = rectangle (100,100,20,20,"green",false);
 
 	//add dynamic stuff to the layers
@@ -41,6 +41,7 @@ function main() {
 			writeMessage(messageLayer, "Good job!");
 			glucose.draggable(false);
 		}
+
 	});
 	
 }
@@ -125,7 +126,7 @@ function barrelProtein (x, y, width, height, color) {
  * @param color
  * @param draggable
  */
-function glucose (x, y, radius, color, draggable) {
+function hexagon (x, y, radius, color, draggable) {
 	return new Kinetic.RegularPolygon({
 		x: x,
 		y: y,
