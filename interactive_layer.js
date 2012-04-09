@@ -33,22 +33,27 @@ function main() {
 
 	//create dynamic elements
 	var glucose = hexagon (10,50,15,"yellow",true);
-	//var ligandBox = rectangle (205,220,20,20,"white",false);
+	var ligandBox = rectangle (215,210,30,30,"blue",false);
+	var gpcr_binding_site = rectangle (245,325,15,15,"blue",false);
 	//var gprotBox = boundRectangle (205,285,50,50,"white",false);
 	var gpcr = barrelProtein (200,250,60,60,"green");
 	//var gprotB = rectangle (100,300,40,40,"blue",true);
 	//var gprotA = rectangle (120,330,20,20,"yellow",true);
-	var alpha = trimeric_g_prot(100,100,30,"red");
+	var trimer = trimeric_g_prot(100,100,30,"red");
 
-	var thing = adenyl_cyclase(400,300,50,50,"green");
+	var effector = adenyl_cyclase(400,300,50,50,"green");
 
-	var guanosine_d = gtp (200,200,15);
+	var GEF = roundedRect(500,500,50,50,20,"orange");
+
+	var guanosine_t = gtp (200,200,15);
 	//add dynamic stuff to the layers
 	mainLayer.add(gpcr);
-	//mainLayer.add(ligandBox);
+	mainLayer.add(ligandBox);
 	//mainLayer.add(gprotBox);
 	mainLayer.add(glucose);
-	mainLayer.add(thing);
+	mainLayer.add(effector);
+	mainLayer.add(GEF);
+	mainLayer.add(gpcr_binding_site);
 	//mainLayer.add(gprotB);
 	//mainLayer.add(gprotA);
 	//mainLayer.add(alpha);
@@ -56,8 +61,8 @@ function main() {
 	//create stage
 	stage.add(mainLayer);
 	stage.add(messageLayer);
-	stage.add(alpha);
-	stage.add(guanosine_d);
+	stage.add(trimer);
+	stage.add(guanosine_t);
 
 	writeMessage(messageLayer, "Drag that glucose in the active site!");
 
@@ -75,12 +80,20 @@ function main() {
 
 			glucose.draggable(false);
 			pathwaySteps ["ligand attachment"]= true;
+			gpcr.fill="red";
 			writeMessage(messageLayer, "Receptor activated");
 		}
 	});
 
-	alpha.on("dragend",function() {
-		console.log(alpha.x+100);
+	trimer.on("dragend",function() {
+		console.log((trimer.x+100) + " " + (trimer.y + 100));
+		if (trimer.x + 100 > gpcr_binding_site.x &&
+			trimer.x + 112 < gpcr_binding_site.x + gpcr_binding_site.width &&
+			trimer.y + 100 > gpcr_binding_site.y &&
+			trimer.y + 112 < gpcr_binding_site.y + gpcr_binding_site.height) {
+			console.log("we are in!");
+			trimer.fill="yellow";
+		}
 	});
 
 	/*gprotB.on("drag",function () {
@@ -107,7 +120,7 @@ function main() {
 			/*gpcr.x += animationIncrement;
 			glucose.x += animationIncrement;
 			ligandBox.x += animationIncrement;*/
-			gpcr.fill = "red";
+			//gpcr.fill = "red";
 			//writeMessage(messageLayer,"Now put that blue g-protein into the binding site!");	
 		}
 
@@ -137,7 +150,7 @@ function inside (a,b) {
 	return (a.x > b.x && 
 	a.x < b.x + b.width && 
 	a.y > b.y &&
-	a.y < b.y + b.height );
+	a.y < b.y + b.height);
 }
 
 /**
@@ -280,8 +293,8 @@ function alpha_subunit (x, y, r, color) {
 	layer.add(protein);
 	layer.add(title);
 	layer.draggable(true);
-	//this.x = protein.x;
-	//this.y=protein.y;
+	this.x = protein.x;
+	this.y=protein.y;
 	//this.onDrag = function()  {
 	//	protein.onDrag();};
 	return layer;
@@ -302,8 +315,10 @@ function trimeric_g_prot (x, y, r, color) {
 			
 			c.moveTo(x,y);
 			c.lineTo(x, y + rbs);
-			c.arc(x + r, y + r, r, (Math.PI * 7/6), (Math.PI * 11/6), true);
-			c.arc(x + d - ebs, y + ebs, ebs, 0, Math.PI*1.5,true);
+			c.arc(x + r, y + r, r, (Math.PI * 7/6), (Math.PI * 5/6), true);
+			c.lineTo(x + r/2, y + r + r/2);
+			c.arc(x + r, y + r, r, (Math.PI * 4/6), (Math.PI * 11/6), true);
+			c.arc(x + d - ebs , y + ebs, ebs, 0, Math.PI*1.5,true);
 			c.arc(x + r, y + r, r, (Math.PI * 5/3), (Math.PI * 4/3), true);
 			c.lineTo(x + rbs, y);
 			
@@ -384,8 +399,8 @@ function trimeric_g_prot (x, y, r, color) {
 	layer.add(alpha);
 	layer.add(alpha_title);
 	layer.draggable(true);
-	//this.x = protein.x;
-	//this.y=protein.y;
+	this.x = alpha.x;
+	this.y = alpha.y;
 	//this.onDrag = function()  {
 	//	protein.onDrag();};
 	return layer;
@@ -393,8 +408,16 @@ function trimeric_g_prot (x, y, r, color) {
 
 function gtp (x,y,r) {
 	var layer = new Kinetic.Layer();
-
-	var base = hexagon(x,y,r,"yellow",false);
+	var font_size = 11;
+	var base = boundRectangle(x,y,r,r,"yellow",false);
+	var letter = new Kinetic.Text({
+		x: x + r/2 - font_size/2,
+		y: y + r/2 - font_size/2 + 1,
+		text:"G",
+		fontSize: font_size,
+		fontFamily:"Calibri",
+		textFill:"black",
+	});
 	var p1 = new Kinetic.Circle({
 		x:x,
 		y:y+r,
@@ -424,6 +447,7 @@ function gtp (x,y,r) {
 	layer.add(p2);
 	layer.add(p1);
 	layer.add(base);
+	layer.add(letter);
 	layer.draggable(true);
 	return layer;
 }
@@ -503,4 +527,28 @@ function adenyl_cyclase (x,y,width,height,color) {
 		strokeWidth:1,
 	});
 	return effector;
+}
+
+function roundedRect (x, y, w, h, r, color) {
+	var rectangle = new Kinetic.Shape({
+		drawFunc:function() {
+			var c = this.getContext();
+			c.beginPath();
+			c.moveTo(x + r,y);
+			c.lineTo(x + w - r, y);
+			c.arcTo(x + w, y, x + w, y + r, r);
+			c.lineTo(x + w, y + h - r);
+			c.arcTo(x + w, y + h, x + w - r, y + h, r);
+			c.lineTo(x + r, y + h);
+			c.arcTo(x, y + h, x, y + h - r, r);
+			c.lineTo(x, y + r);
+			c.arcTo(x,y,x+r, y, r);
+			c.closePath();
+			this.fillStroke();
+		},
+		fill: color,
+		stroke: "black",
+		strokeWidth:1
+	});
+	return rectangle;
 }
