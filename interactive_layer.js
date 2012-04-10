@@ -2,7 +2,7 @@ var canvasHeight = 800;
 var canvasWidth = 800;
 
 function main() {
-	var stage = new Kinetic.Stage("canvas", canvasWidth, canvasHeight);
+    var stage = new Kinetic.Stage("canvas", canvasWidth, canvasHeight);
 	var mainLayer = new Kinetic.Layer();
 	var messageLayer = new Kinetic.Layer();
 
@@ -98,8 +98,8 @@ function main() {
 
 				pathwaySteps["g-protein attachment"] = true;
 				console.log("we are in!");
-				var gtp_x = GEF.base.x;
-				var gtp_y = GEF.base.y;
+				var gtp_x = GEF.x() + 27;
+				var gtp_y = GEF.y() + 7;
 				GEF.layer.remove(GEF.base);
 				GEF.layer.remove(GEF.letter);
 				GEF.layer.remove(GEF.p1);
@@ -108,8 +108,11 @@ function main() {
 				GTP = gtp(gtp_x,gtp_y,15);
 				stage.add(GTP);
 				GEF.layer.draw();
+                
+                trimer.layer.draggable(false);
+                
+                //trimer.layer
 
-				trimer.
 			}
 			else {
 			writeMessage(messageLayer,"It is probably too early for the G protein. Make sure the lignad is on the receptor first");
@@ -540,11 +543,19 @@ function loaded_GEF (x,y) {
 	
 	this.GEF = roundedRect(100,500,size,size,curve_radius,"orange");
 	
-	font_size = 11;
-	gx = x + 27;
-	gy = y + 7;
+	var font_size = 11;
+	var gx = x + 27;
+	var gy = y + 7;
 	console.log(gy);
-	gr = 15;
+	var gr = 15;
+
+    this.initial_x = x;
+	this.initial_y = y;
+
+    this.x = function () {
+		return this.layer.x + this.initial_x;}
+	this.y = function () {
+		return this.layer.y + this.initial_y;}
 
 	this.base = boundRectangle(gx,gy,gr,gr,"yellow",false);
 	this.letter = new Kinetic.Text({
@@ -690,3 +701,4 @@ function roundedRect (x, y, w, h, r, color) {
 	});
 	return rectangle;
 }
+
