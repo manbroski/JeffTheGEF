@@ -23,6 +23,7 @@ function main() {
 
 	//create static elements
 	mainLayer.add(rect_bilayer(250,60,30));
+	//just a useless comment
 
 	//create dynamic elements
 	var glucose = hexagon (10,50,15,"yellow",true);
