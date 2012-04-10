@@ -39,20 +39,22 @@ function main() {
 	var gpcr = barrelProtein (200,250,60,60,"green");
 	//var gprotB = rectangle (100,300,40,40,"blue",true);
 	//var gprotA = rectangle (120,330,20,20,"yellow",true);
-	var trimer = trimeric_g_prot(100,100,30,"red");
+	var trimer = new trimeric_g_prot(100,100,30,"red");
 
 	var effector = adenyl_cyclase(400,300,50,50,"green");
 
-	var GEF = roundedRect(500,500,50,50,20,"orange");
+//	var GEF = roundedRect(500,500,50,50,20,"orange");
 
-	var guanosine_t = gtp (200,200,15);
+	var GEF = new loaded_GEF(100,500);
+	var GTP;
+
 	//add dynamic stuff to the layers
 	mainLayer.add(gpcr);
 	mainLayer.add(ligandBox);
 	//mainLayer.add(gprotBox);
 	mainLayer.add(glucose);
 	mainLayer.add(effector);
-	mainLayer.add(GEF);
+//	mainLayer.add(GEF);
 	mainLayer.add(gpcr_binding_site);
 	//mainLayer.add(gprotB);
 	//mainLayer.add(gprotA);
@@ -61,8 +63,8 @@ function main() {
 	//create stage
 	stage.add(mainLayer);
 	stage.add(messageLayer);
-	stage.add(trimer);
-	stage.add(guanosine_t);
+	stage.add(trimer.layer);
+	stage.add(GEF.layer);
 
 	writeMessage(messageLayer, "Drag that glucose in the active site!");
 
@@ -81,18 +83,40 @@ function main() {
 			glucose.draggable(false);
 			pathwaySteps ["ligand attachment"]= true;
 			gpcr.fill="red";
-			writeMessage(messageLayer, "Receptor activated");
+			writeMessage(messageLayer, "Receptor activated. Now add the G protein");
 		}
 	});
 
-	trimer.on("dragend",function() {
-		console.log((trimer.x+100) + " " + (trimer.y + 100));
-		if (trimer.x + 100 > gpcr_binding_site.x &&
-			trimer.x + 112 < gpcr_binding_site.x + gpcr_binding_site.width &&
-			trimer.y + 100 > gpcr_binding_site.y &&
-			trimer.y + 112 < gpcr_binding_site.y + gpcr_binding_site.height) {
-			console.log("we are in!");
-			trimer.fill="yellow";
+	trimer.layer.on("dragend",function() {
+		console.log((trimer.x()) + " " + (trimer.y()));
+		//size restriction should be 12 for this, but i am making it smaller
+		if (trimer.x() > gpcr_binding_site.x &&
+			trimer.x() + 5 < gpcr_binding_site.x + gpcr_binding_site.width &&
+			trimer.y() > gpcr_binding_site.y &&
+			trimer.y() + 5 < gpcr_binding_site.y + gpcr_binding_site.height) {
+			if (pathwaySteps["ligand attachment"]) {
+
+				pathwaySteps["g-protein attachment"] = true;
+				console.log("we are in!");
+				var gtp_x = GEF.base.x;
+				var gtp_y = GEF.base.y;
+				GEF.layer.remove(GEF.base);
+				GEF.layer.remove(GEF.letter);
+				GEF.layer.remove(GEF.p1);
+				GEF.layer.remove(GEF.p2);
+				GEF.layer.remove(GEF.p3);
+				GTP = gtp(gtp_x,gtp_y,15);
+				stage.add(GTP);
+				GEF.layer.draw();
+
+				trimer.
+			}
+			else {
+			writeMessage(messageLayer,"It is probably too early for the G protein. Make sure the lignad is on the receptor first");
+			}
+
+			//trimer.alpha.fill="yellow";
+			mainLayer.draw();
 		}
 	});
 
@@ -120,8 +144,13 @@ function main() {
 			/*gpcr.x += animationIncrement;
 			glucose.x += animationIncrement;
 			ligandBox.x += animationIncrement;*/
-			//gpcr.fill = "red";
+			gpcr.fill = "red";
 			//writeMessage(messageLayer,"Now put that blue g-protein into the binding site!");	
+		}
+		if (pathwaySteps["g-protein attachment"]) {
+			
+			trimer.alpha.fill = "green";
+			trimer.layer.draw();
 		}
 
 		mainLayer.draw();
@@ -300,13 +329,24 @@ function alpha_subunit (x, y, r, color) {
 	return layer;
 }
 
+/**
+ * This an object that encapsulates the trimeric G protein assembly together with a GDP. It includes the labels and all too
+ * Address the drawing layer as this.layer
+ **/
 function trimeric_g_prot (x, y, r, color) {
+	
 	var	rbs = r *2/5;
 	var ebs = r *2/5;
 	var d = r * 2;
-	//var c;
-	var layer = new Kinetic.Layer();
-	var alpha = new Kinetic.Shape({
+	this.layer = new Kinetic.Layer();
+	this.initial_x = x;
+	this.initial_y = y;
+	this.x = function () {
+		return this.layer.x + this.initial_x;}
+	this.y = function () {
+		return this.layer.y + this.initial_y;}
+
+	this.alpha = new Kinetic.Shape({
 		drawFunc: function() {
 			var c = this.getContext();
 			
@@ -391,19 +431,57 @@ function trimeric_g_prot (x, y, r, color) {
 		fontFamily:"Calibri",
 		textFill:"white",
 	});
+	
+	font_size = 11;
+	gx = x;
+	gy = y + 45;
+	console.log(gy);
+	gr = 15;
 
-	layer.add(beta);
-	layer.add(beta_title);
-	layer.add(gamma);
-	layer.add(gamma_title);
-	layer.add(alpha);
-	layer.add(alpha_title);
-	layer.draggable(true);
-	this.x = alpha.x;
-	this.y = alpha.y;
+	var base = boundRectangle(gx,gy,gr,gr,"yellow",false);
+	var letter = new Kinetic.Text({
+		x: gx + gr/2 - font_size/2,
+		y: gy + gr/2 - font_size/2 + 1,
+		text:"G",
+		fontSize: font_size,
+		fontFamily:"Calibri",
+		textFill:"black",
+	});
+	var p1 = new Kinetic.Circle({
+		x:gx,
+		y:gy+gr,
+		radius:gr/2,
+		fill:"lightblue",
+		stroke:"black",
+		strokeWidth:1
+	});
+	var p2 = new Kinetic.Circle({
+		x:gx-gr/2,
+		y:gy+3*gr/2,
+		radius:gr/2,
+		fill:"lightblue",
+		stroke:"black",
+		strokeWidth:1
+	});
+
+	this.layer.add(p2);
+	this.layer.add(p1);
+	this.layer.add(base);
+	this.layer.add(letter);
+
+
+	this.layer.add(beta);
+	this.layer.add(beta_title);
+	this.layer.add(gamma);
+	this.layer.add(gamma_title);
+	this.layer.add(this.alpha);
+	this.layer.add(alpha_title);
+	this.layer.draggable(true);
+	//this.x = alpha.x;
+	//this.y = alpha.y;
 	//this.onDrag = function()  {
 	//	protein.onDrag();};
-	return layer;
+	//return layer;
 }
 
 function gtp (x,y,r) {
@@ -450,6 +528,66 @@ function gtp (x,y,r) {
 	layer.add(letter);
 	layer.draggable(true);
 	return layer;
+}
+
+/**
+ * This is a shape of a GEF protein, initially carrying a GTP
+ * */
+function loaded_GEF (x,y) {
+	var size = 50;
+	var curve_radius = 20;
+	this.layer = new Kinetic.Layer();
+	
+	this.GEF = roundedRect(100,500,size,size,curve_radius,"orange");
+	
+	font_size = 11;
+	gx = x + 27;
+	gy = y + 7;
+	console.log(gy);
+	gr = 15;
+
+	this.base = boundRectangle(gx,gy,gr,gr,"yellow",false);
+	this.letter = new Kinetic.Text({
+		x: gx + gr/2 - font_size/2,
+		y: gy + gr/2 - font_size/2 + 1,
+		text:"G",
+		fontSize: font_size,
+		fontFamily:"Calibri",
+		textFill:"black",
+	});
+	this.p1 = new Kinetic.Circle({
+		x:gx,
+		y:gy+gr,
+		radius:gr/2,
+		fill:"lightblue",
+		stroke:"black",
+		strokeWidth:1
+	});
+	this.p2 = new Kinetic.Circle({
+		x:gx-gr/2,
+		y:gy+3*gr/2,
+		radius:gr/2,
+		fill:"lightblue",
+		stroke:"black",
+		strokeWidth:1
+	});
+
+	this.p3 = new Kinetic.Circle({
+		x:gx-gr,
+		y:gy+2*gr,
+		radius:gr/2,
+		fill:"lightblue",
+		stroke:"black",
+		strokeWidth:1
+	});
+	this.layer.add(this.GEF);
+	this.layer.add(this.p3);
+	this.layer.add(this.p2);
+	this.layer.add(this.p1);
+	this.layer.add(this.base);
+	this.layer.add(this.letter);
+	this.layer.draggable(true);
+
 }
 
 /**
