@@ -7,6 +7,7 @@ function main() {
 	var messageLayer = new Kinetic.Layer();
 
 	var pathwaySteps = new Array();
+	//this is a bit clanky, but it will make the code a little more readable in the animation loop
 	pathwaySteps["ligand attachment"] = false;
 	pathwaySteps["g-protein attachment"] = false;
 	pathwaySteps["gef appearance"] = false;
@@ -21,32 +22,56 @@ function main() {
 	pathwaySteps["atp transformation"] = false;
 	pathwaySteps["camp detachment"] = false;
 
+
+
+
+	//TODO create an automatic image loader	
+
 	//create static elements
 	mainLayer.add(rect_bilayer(250,60,30));
+
 
 	//create dynamic elements
 	var glucose = hexagon (10,50,15,"yellow",true);
 	var ligandBox = rectangle (215,210,30,30,"blue",false);
 	var gpcr_binding_site = rectangle (245,325,15,15,"blue",false);
+	//var gprotBox = boundRectangle (205,285,50,50,"white",false);
 	var gpcr = barrelProtein (200,250,60,60,"green");
-	//var trimer = new trimeric_g_protein(100,100,30,"red");
-	var gdp = new gdp (200,200,15);
+	//var gprotB = rectangle (100,300,40,40,"blue",true);
+	//var gprotA = rectangle (120,330,20,20,"yellow",true);
+	var trimer = new trimeric_g_prot(100,100,30,"red");
+
 	var effector = adenyl_cyclase(400,300,50,50,"green");
+
+
+	var group = new Kinetic.Group();
+	group.add(rectangle(10,10,10,10,"blue",false));
+	group.add(rectangle(20,20,10,10,"red",false));
+	group.draggable(true);
+	mainLayer.add(group);
+	//
+//	var GEF = roundedRect(500,500,50,50,20,"orange");
+
 	var GEF = new loaded_GEF(100,500);
 	var GTP;
 
 	//add dynamic stuff to the layers
 	mainLayer.add(gpcr);
 	mainLayer.add(ligandBox);
+	//mainLayer.add(gprotBox);
 	mainLayer.add(glucose);
 	mainLayer.add(effector);
+//	mainLayer.add(GEF);
 	mainLayer.add(gpcr_binding_site);
-	//mainLayer.add(trimer.group);
-	mainLayer.add(gdp.group);
+	//mainLayer.add(gprotB);
+	//mainLayer.add(gprotA);
+	//mainLayer.add(alpha);
 
 	//create stage
 	stage.add(mainLayer);
 	stage.add(messageLayer);
+	stage.add(trimer.layer);
+	stage.add(trimer.gdp.layer);
 	stage.add(GEF.layer);
 
 	writeMessage(messageLayer, "Drag that glucose in the active site!");
@@ -92,8 +117,9 @@ function main() {
 				stage.add(GTP);
 				GEF.layer.draw();
                 
-                trimer.group.draggable(false);
+                trimer.layer.draggable(false);
                 
+                //trimer.layer
 
 			}
 			else {
@@ -168,6 +194,31 @@ function inside (a,b) {
 }
 
 /**
+ * Create a simple bilayer backdrop.
+ * Solid, no graphics
+ * @param origin: origin of the bilayer drawing (upper left corner)
+ * @param thickness: height of the drawing
+ * @param curvature: inflection value for the curve. Suggested: 30
+ */
+function bilayer(origin, thickness, curvature) {
+	return new Kinetic.Shape({
+		drawFunc: function() {
+			var context = this.getContext();
+			context.beginPath();
+			context.moveTo(0, origin);
+			context.quadraticCurveTo(canvasWidth/2, origin - curvature, canvasWidth, origin);
+			context.lineTo(canvasWidth, origin + thickness);
+			context.quadraticCurveTo(canvasWidth/2,	origin + thickness - curvature , 0, origin + thickness);
+			context.closePath();
+			this.fillStroke();
+		},
+		fill:"#FFDF64",
+		stroke: "black",
+		strokeWidth: 1
+	});
+}
+
+/**
  * Create a rectangular bilayer backdrop.
  * Solid, no graphics
  * @param origin: origin of the bilayer drawing (upper left corner)
@@ -191,7 +242,6 @@ function rect_bilayer(origin, thickness, curvature) {
 		strokeWidth: 1
 	});
 }
-
 /**
  * Create a simple barrel protein drawing.
  * Suggested to be used as a generic membrane protein shape.
@@ -243,14 +293,11 @@ function barrelProtein (x, y, width, height, color) {
 
 
 function alpha_subunit (x, y, r, color) {
-
-	//start off with defining some crap
 	var	rbs = r *2/5;
 	var ebs = r *2/5;
 	var d = r * 2;
-
-	var group = new Kinetic.Group();
-	var alpha = new Kinetic.Shape({
+	var layer = new Kinetic.Layer();
+	var protein = new Kinetic.Shape({
 		drawFunc: function() {
 			var c = this.getContext();
 			
@@ -271,8 +318,9 @@ function alpha_subunit (x, y, r, color) {
 		fill:color,
 		stoke: "black",
 		strokeWidth: 1,
+		//draggable:true
 	});
-	var font_size = 20;	
+	font_size = 20;	
 	var title = new Kinetic.Text({
 		x:x+r-font_size/2,
 		y:y+r-font_size/2,
@@ -282,35 +330,58 @@ function alpha_subunit (x, y, r, color) {
 		textFill:"white",
 	});
 
-	group.add(alpha);
-	group.add(title);
-	group.draggable(true);
-	return group;
+	layer.add(protein);
+	layer.add(title);
+	layer.draggable(true);
+	this.x = protein.x;
+	this.y=protein.y;
+	//this.onDrag = function()  {
+	//	protein.onDrag();};
+	return layer;
 }
 
 /**
  * This an object that encapsulates the trimeric G protein assembly together with a GDP. It includes the labels and all too
  * Address the drawing layer as this.layer
  **/
-function trimeric_g_protein (x, y, r, color) {
+function trimeric_g_prot (x, y, r, color) {
 	
 	var	rbs = r *2/5;
 	var ebs = r *2/5;
 	var d = r * 2;
-	//this.layer = new Kinetic.Layer();
-	this.group = new Kinetic.Group();
-
-	//TODO: resolve for better coordinate system!
+	this.layer = new Kinetic.Layer();
 	this.initial_x = x;
 	this.initial_y = y;
-
 	this.x = function () {
-		return this.group.x + this.initial_x;}
+		return this.layer.x + this.initial_x;}
 	this.y = function () {
-		return this.group.y + this.initial_y;}
+		return this.layer.y + this.initial_y;}
 
-
-	//this.alpha = new alpha_subunit(x,y,r,color);
+	this.alpha = new Kinetic.Shape({
+		drawFunc: function() {
+			var c = this.getContext();
+			
+			//draw
+			c.beginPath();
+			
+			c.moveTo(x,y);
+			c.lineTo(x, y + rbs);
+			c.arc(x + r, y + r, r, (Math.PI * 7/6), (Math.PI * 5/6), true);
+			c.lineTo(x + r/2, y + r + r/2);
+			c.arc(x + r, y + r, r, (Math.PI * 4/6), (Math.PI * 11/6), true);
+			c.arc(x + d - ebs , y + ebs, ebs, 0, Math.PI*1.5,true);
+			c.arc(x + r, y + r, r, (Math.PI * 5/3), (Math.PI * 4/3), true);
+			c.lineTo(x + rbs, y);
+			
+			c.closePath();
+			this.fillStroke();
+			
+		},
+		fill:color,
+		stoke: "black",
+		strokeWidth: 1,
+		//draggable:true
+	});
 
 	var gamma = new Kinetic.Shape({
 		drawFunc: function() {
@@ -410,14 +481,14 @@ function trimeric_g_protein (x, y, r, color) {
 //	this.layer.add(base);
 //	this.layer.add(letter);
 
-	this.group.add(this.gdp.group);
-	this.group.add(beta);
-	this.group.add(beta_title);
-	this.group.add(gamma);
-	this.group.add(gamma_title);
-	this.group.add(this.alpha);
-	this.group.add(alpha_title);
-	this.group.draggable(true);
+	this.layer.add(this.gdp.layer);
+	this.layer.add(beta);
+	this.layer.add(beta_title);
+	this.layer.add(gamma);
+	this.layer.add(gamma_title);
+	this.layer.add(this.alpha);
+	this.layer.add(alpha_title);
+	this.layer.draggable(true);
 	//this.x = alpha.x;
 	//this.y = alpha.y;
 	//this.onDrag = function()  {
@@ -473,7 +544,7 @@ function gtp (x,y,r) {
 
 function gdp (x,y,r) {
 	
-	this.group = new Kinetic.Group();
+	this.layer = new Kinetic.Layer();
 	
 	var font_size = 11;
 	var base = boundRectangle(x,y,r,r,"yellow",false);
@@ -502,12 +573,11 @@ function gdp (x,y,r) {
 		strokeWidth:1
 	});
 
-	this.group.add(p2);
-	this.group.add(p1);
-	this.group.add(base);
-	this.group.add(letter);
-	this.group.draggable(true);
-	//return this.group;
+	this.layer.add(p2);
+	this.layer.add(p1);
+	this.layer.add(base);
+	this.layer.add(letter);
+	this.layer.draggable(true);
 }
 /**
  * This is a shape of a GEF protein, initially carrying a GTP
