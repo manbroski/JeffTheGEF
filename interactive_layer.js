@@ -30,8 +30,8 @@ function main() {
 	var ligandBox = rectangle (215,210,30,30,"blue",false);
 	var gpcr_binding_site = rectangle (245,325,15,15,"blue",false);
 	var gpcr = barrelProtein (200,250,60,60,"green");
-	//var trimer = new trimeric_g_protein(100,100,30,"red");
-	var gdp = new gdp (200,200,15);
+	var trimer = new trimeric_g_protein(100,100,30,"red");
+	//var guanosine_diphosphate = new gdp (200,200,15);
 	var effector = adenyl_cyclase(400,300,50,50,"green");
 	var GEF = new loaded_GEF(100,500);
 	var GTP;
@@ -42,13 +42,13 @@ function main() {
 	mainLayer.add(glucose);
 	mainLayer.add(effector);
 	mainLayer.add(gpcr_binding_site);
-	//mainLayer.add(trimer.group);
-	mainLayer.add(gdp.group);
+	mainLayer.add(trimer.group);
+	mainLayer.add(GEF.group);
+	//mainLayer.add(guanosine_diphosphate.group);
 
 	//create stage
 	stage.add(mainLayer);
 	stage.add(messageLayer);
-	stage.add(GEF.layer);
 
 	writeMessage(messageLayer, "Drag that glucose in the active site!");
 
@@ -71,8 +71,8 @@ function main() {
 		}
 	});
 
-	trimer.layer.on("dragend",function() {
-		console.log((trimer.x()) + " " + (trimer.y()));
+	trimer.group.on("dragend",function() {
+		//console.log((trimer.x()) + " " + (trimer.y()));
 		//size restriction should be 12 for this, but i am making it smaller
 		if (trimer.x() > gpcr_binding_site.x &&
 			trimer.x() + 5 < gpcr_binding_site.x + gpcr_binding_site.width &&
@@ -81,19 +81,20 @@ function main() {
 			if (pathwaySteps["ligand attachment"]) {
 
 				pathwaySteps["g-protein attachment"] = true;
-				console.log("we are in!");
+				//console.log("we are in!");
 				var gtp_x = GEF.x() + 27;
 				var gtp_y = GEF.y() + 7;
-				GEF.layer.remove(GEF.base);
-				GEF.layer.remove(GEF.letter);
-				GEF.layer.remove(GEF.p1);
-				GEF.layer.remove(GEF.p2);
-				GEF.layer.remove(GEF.p3);
-				GTP = gtp(gtp_x,gtp_y,15);
-				stage.add(GTP);
-				GEF.layer.draw();
+				log("Hello from vancouver");
+				GEF.group.remove(GEF.base);
+				GEF.group.remove(GEF.letter);
+				GEF.group.remove(GEF.p1);
+				GEF.group.remove(GEF.p2);
+				GEF.group.remove(GEF.p3);
+				var guanosine_triphosphate = gtp(gtp_x,gtp_y,15);
+				mainLayer.add(guanosine_triphosphate);
+				//GEF.layer.draw();
                 
-                trimer.group.draggable(false);
+                		trimer.group.draggable(false);
                 
 
 			}
@@ -134,9 +135,9 @@ function main() {
 			//writeMessage(messageLayer,"Now put that blue g-protein into the binding site!");	
 		}
 		if (pathwaySteps["g-protein attachment"]) {
-			
+			log("hello from chicago!");	
 			trimer.alpha.fill = "green";
-			trimer.layer.draw();
+			//trimer.layer.draw();
 		}
 
 		mainLayer.draw();
@@ -144,6 +145,16 @@ function main() {
 	});
 	stage.start();
 	
+}
+
+/**
+ * Firefox  3 compliant log function
+ */
+ function log () {
+    if (typeof console == 'undefined') {
+        return;
+    }
+    console.log.apply(console, arguments);
 }
 
 
@@ -295,7 +306,7 @@ function alpha_subunit (x, y, r, color) {
  **/
 function trimeric_g_protein (x, y, r, color) {
 	
-	var	rbs = r *2/5;
+	var rbs = r *2/5;
 	var ebs = r *2/5;
 	var d = r * 2;
 	//this.layer = new Kinetic.Layer();
@@ -311,7 +322,7 @@ function trimeric_g_protein (x, y, r, color) {
 		return this.group.y + this.initial_y;}
 
 
-	//this.alpha = new alpha_subunit(x,y,r,color);
+	this.alpha = new alpha_subunit(x,y,r,color);
 
 	var gamma = new Kinetic.Shape({
 		drawFunc: function() {
@@ -376,48 +387,20 @@ function trimeric_g_protein (x, y, r, color) {
 	font_size = 11;
 	gx = x;
 	gy = y + 45;
-	console.log(gy);
+	//console.log(gy);
 	gr = 15;
 	this.gdp = new gdp(gx,gy,gr);
 
-//	var base = boundRectangle(gx,gy,gr,gr,"yellow",false);
-//	var letter = new Kinetic.Text({
-//		x: gx + gr/2 - font_size/2,
-//		y: gy + gr/2 - font_size/2 + 1,
-//		text:"G",
-//		fontSize: font_size,
-//		fontFamily:"Calibri",
-//		textFill:"black",
-//	});
-//	var p1 = new Kinetic.Circle({
-//		x:gx,
-//		y:gy+gr,
-//		radius:gr/2,
-//		fill:"lightblue",
-//		stroke:"black",
-//		strokeWidth:1
-//	});
-//	var p2 = new Kinetic.Circle({
-//		x:gx-gr/2,
-//		y:gy+3*gr/2,
-//		radius:gr/2,
-//		fill:"lightblue",
-//		stroke:"black",
-//		strokeWidth:1
-//	});
-//
-//	this.layer.add(p2);
-//	this.layer.add(p1);
-//	this.layer.add(base);
-//	this.layer.add(letter);
 
-	this.group.add(this.gdp.group);
+
+
 	this.group.add(beta);
 	this.group.add(beta_title);
 	this.group.add(gamma);
 	this.group.add(gamma_title);
 	this.group.add(this.alpha);
 	this.group.add(alpha_title);
+	this.group.add(this.gdp.group);
 	this.group.draggable(true);
 	//this.x = alpha.x;
 	//this.y = alpha.y;
@@ -427,7 +410,8 @@ function trimeric_g_protein (x, y, r, color) {
 }
 
 function gtp (x,y,r) {
-	var layer = new Kinetic.Layer();
+	this.group = new Kinetic.Group();
+
 	var font_size = 11;
 	var base = boundRectangle(x,y,r,r,"yellow",false);
 	var letter = new Kinetic.Text({
@@ -438,6 +422,7 @@ function gtp (x,y,r) {
 		fontFamily:"Calibri",
 		textFill:"black",
 	});
+
 	var p1 = new Kinetic.Circle({
 		x:x,
 		y:y+r,
@@ -446,6 +431,7 @@ function gtp (x,y,r) {
 		stroke:"black",
 		strokeWidth:1
 	});
+
 	var p2 = new Kinetic.Circle({
 		x:x-r/2,
 		y:y+3*r/2,
@@ -463,13 +449,12 @@ function gtp (x,y,r) {
 		stroke:"black",
 		strokeWidth:1
 	});
-	layer.add(p3);
-	layer.add(p2);
-	layer.add(p1);
-	layer.add(base);
-	layer.add(letter);
-	layer.draggable(true);
-	return layer;
+	group.add(p3);
+	group.add(p2);
+	group.add(p1);
+	group.add(base);
+	group.add(letter);
+	group.draggable(true);
 }
 
 function gdp (x,y,r) {
@@ -516,25 +501,26 @@ function gdp (x,y,r) {
 function loaded_GEF (x,y) {
 	var size = 50;
 	var curve_radius = 20;
-	this.layer = new Kinetic.Layer();
+	this.group = new Kinetic.Group();
 	
-	this.GEF = roundedRect(100,500,size,size,curve_radius,"orange");
+	this.protein = roundedRect(100,500,size,size,curve_radius,"orange");
 	
 	var font_size = 11;
 	var gx = x + 27;
 	var gy = y + 7;
-	console.log(gy);
+	//console.log(gy);
 	var gr = 15;
 
     this.initial_x = x;
 	this.initial_y = y;
 
     this.x = function () {
-		return this.layer.x + this.initial_x;}
+		return this.group.x + this.initial_x;}
 	this.y = function () {
-		return this.layer.y + this.initial_y;}
+		return this.group.y + this.initial_y;}
 
 	this.base = boundRectangle(gx,gy,gr,gr,"yellow",false);
+
 	this.letter = new Kinetic.Text({
 		x: gx + gr/2 - font_size/2,
 		y: gy + gr/2 - font_size/2 + 1,
@@ -543,6 +529,7 @@ function loaded_GEF (x,y) {
 		fontFamily:"Calibri",
 		textFill:"black",
 	});
+
 	this.p1 = new Kinetic.Circle({
 		x:gx,
 		y:gy+gr,
@@ -551,6 +538,7 @@ function loaded_GEF (x,y) {
 		stroke:"black",
 		strokeWidth:1
 	});
+
 	this.p2 = new Kinetic.Circle({
 		x:gx-gr/2,
 		y:gy+3*gr/2,
@@ -568,13 +556,13 @@ function loaded_GEF (x,y) {
 		stroke:"black",
 		strokeWidth:1
 	});
-	this.layer.add(this.GEF);
-	this.layer.add(this.p3);
-	this.layer.add(this.p2);
-	this.layer.add(this.p1);
-	this.layer.add(this.base);
-	this.layer.add(this.letter);
-	this.layer.draggable(true);
+	this.group.add(this.protein);
+	this.group.add(this.p3);
+	this.group.add(this.p2);
+	this.group.add(this.p1);
+	this.group.add(this.base);
+	this.group.add(this.letter);
+	this.group.draggable(true);
 
 }
 
