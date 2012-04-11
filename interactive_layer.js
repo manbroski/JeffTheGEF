@@ -84,7 +84,6 @@ function main() {
 				//console.log("we are in!");
 				var gtp_x = GEF.x() + 27;
 				var gtp_y = GEF.y() + 7;
-				log("Hello from vancouver");
 				GEF.group.remove(GEF.base);
 				GEF.group.remove(GEF.letter);
 				GEF.group.remove(GEF.p1);
