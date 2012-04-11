@@ -84,17 +84,20 @@ function main() {
 				//console.log("we are in!");
 				var gtp_x = GEF.x() + 27;
 				var gtp_y = GEF.y() + 7;
-				log("Hello from vancouver");
+				console.log("Hello from vancouver");
 				GEF.group.remove(GEF.base);
 				GEF.group.remove(GEF.letter);
 				GEF.group.remove(GEF.p1);
 				GEF.group.remove(GEF.p2);
 				GEF.group.remove(GEF.p3);
-				var guanosine_triphosphate = gtp(gtp_x,gtp_y,15);
+				console.log("Pants");
+				var guanosine_triphosphate = new gtp(gtp_x,gtp_y,15);
+				console.log("Banana");
 				mainLayer.add(guanosine_triphosphate);
 				//GEF.layer.draw();
-                
-                		trimer.group.draggable(false);
+                console.log("Line 96");
+				trimer.group.draggable(false);
+				console.log("Line 98");
                 
 
 			}
@@ -135,8 +138,8 @@ function main() {
 			//writeMessage(messageLayer,"Now put that blue g-protein into the binding site!");	
 		}
 		if (pathwaySteps["g-protein attachment"]) {
-			log("hello from chicago!");	
-			trimer.alpha.fill = "green";
+			//log("hello from chicago!");	
+			trimer.alpha.protein.fill = "green";
 			//trimer.layer.draw();
 		}
 
@@ -261,8 +264,8 @@ function alpha_subunit (x, y, r, color) {
 	var ebs = r *2/5;
 	var d = r * 2;
 
-	var group = new Kinetic.Group();
-	var alpha = new Kinetic.Shape({
+	this.group = new Kinetic.Group();
+	this.protein = new Kinetic.Shape({
 		drawFunc: function() {
 			var c = this.getContext();
 			
@@ -294,10 +297,10 @@ function alpha_subunit (x, y, r, color) {
 		textFill:"white",
 	});
 
-	group.add(alpha);
-	group.add(title);
-	group.draggable(true);
-	return group;
+	this.group.add(this.protein);
+	this.group.add(title);
+	this.group.draggable(true);
+	//return group;
 }
 
 /**
@@ -398,7 +401,7 @@ function trimeric_g_protein (x, y, r, color) {
 	this.group.add(beta_title);
 	this.group.add(gamma);
 	this.group.add(gamma_title);
-	this.group.add(this.alpha);
+	this.group.add(this.alpha.group);
 	this.group.add(alpha_title);
 	this.group.add(this.gdp.group);
 	this.group.draggable(true);
@@ -449,12 +452,12 @@ function gtp (x,y,r) {
 		stroke:"black",
 		strokeWidth:1
 	});
-	group.add(p3);
-	group.add(p2);
-	group.add(p1);
-	group.add(base);
-	group.add(letter);
-	group.draggable(true);
+	this.group.add(p3);
+	this.group.add(p2);
+	this.group.add(p1);
+	this.group.add(base);
+	this.group.add(letter);
+	this.group.draggable(true);
 }
 
 function gdp (x,y,r) {
