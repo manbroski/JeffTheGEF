@@ -31,6 +31,7 @@ function main() {
 	var glucose = hexagon (10,50,15,"yellow",true);
 	var ligandBox = rectangle (215,210,30,30,"blue",false);
 	var gpcr_binding_site = rectangle (245,325,15,15,"blue",false);
+
 	var gpcr = barrelProtein (200,250,60,60,"green");
 	var trimer = new trimeric_g_protein(100,100,30,"red");
 	//var guanosine_diphosphate = new gdp (200,200,15);
@@ -129,7 +130,14 @@ function main() {
 	});
 
 		guanosine_triphosphate.group.on("dragend", function () {
-			console.log("success!");
+			x = guanosine_triphosphate.group.x + 45;
+			y = guanosine_triphosphate.group.y;
+			//console.log(guanosine_triphosphate.base);
+			//console.log(trimer.alpha.gtp_binding_site);
+			if (inside(guanosine_triphosphate.base, trimer.alpha.gtp_binding_site)) {
+				console.log("Success");
+			}
+			//if (x < )
 		});
 	//adding some super simple animation
 	var animationIncrement = 3;
@@ -154,16 +162,6 @@ function main() {
 				if (pathwaySteps["g-protein docking"] == false)
 				{
 
-					var thing = new Kinetic.Rect({
-						x: 100,
-						y: 100,
-						width: 50,
-						height: 50,
-						alpha: 0.2
-					});
-					mainLayer.add(thing);
-                	//thing.transitionTo({alpha: 1,duration: 1,});
-					//effector.transitionTo({alpha: 1});
 					pathwaySteps["g-protein docking"] = true;
 				}
 			}
@@ -315,6 +313,14 @@ function alpha_subunit (x, y, r, color) {
 		stoke: "black",
 		strokeWidth: 1,
 	});
+
+	this.gtp_binding_site = new Kinetic.Rect({
+		x: x,
+		y: y + 2*r - gbs,
+		width: 20,
+		height: 20,
+		//fill: "blue",
+	});
 	var font_size = 20;	
 	var title = new Kinetic.Text({
 		x:x+r-font_size/2,
@@ -326,6 +332,7 @@ function alpha_subunit (x, y, r, color) {
 	});
 
 	this.group.add(this.protein);
+	this.group.add(this.gtp_binding_site);
 	this.group.add(title);
 	this.group.draggable(true);
 	//return group;
@@ -429,7 +436,7 @@ function trimeric_g_protein (x, y, r, color) {
 	this.group.add(gamma);
 	this.group.add(gamma_title);
 	this.group.add(this.alpha.group);
-	this.group.add(this.gdp.group);
+	//this.group.add(this.gdp.group);
 	this.group.draggable(true);
 	//this.x = alpha.x;
 	//this.y = alpha.y;
@@ -442,7 +449,7 @@ function gtp (x,y,r) {
 	this.group = new Kinetic.Group();
 
 	var font_size = 11;
-	var base = new boundRectangle(x,y,r,r,"yellow",false);
+	this.base = new boundRectangle(x,y,r,r,"yellow",false);
 	var letter = new Kinetic.Text({
 		x: x + r/2 - font_size/2,
 		y: y + r/2 - font_size/2 + 1,
@@ -481,7 +488,7 @@ function gtp (x,y,r) {
 	this.group.add(p3);
 	this.group.add(p2);
 	this.group.add(p1);
-	this.group.add(base.protein);
+	this.group.add(this.base.protein);
 	this.group.add(letter);
 	this.group.draggable(true);
 }
