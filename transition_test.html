@@ -1,0 +1,51 @@
+<head>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v3.9.2.js">
+    </script>
+    <script>
+        window.onload = function() {
+            var stage = new Kinetic.Stage({
+                container: "container",
+                width: 578,
+                height: 200
+            });
+            var layer = new Kinetic.Layer();
+            var rect = new rect_bilayer(200,100,20);
+            layer.add(rect.tangle);
+            stage.add(layer);
+ 
+            /*
+             * wait one second before starting the
+             * transition
+             */
+            //setTimeout(function() {
+                rect.tangle.transitionTo({
+                    alpha: 1,
+                    //duration: 1,
+                });
+            //}, 1000);
+        
+		};
+function rect_bilayer(origin, thickness, canvasWidth) {
+	this.tangle = new Kinetic.Shape({
+		drawFunc: function() {
+			var context = this.getContext();
+			context.beginPath();
+			context.moveTo(0, origin);
+			context.lineTo(canvasWidth,origin);
+			context.lineTo(canvasWidth, origin + thickness);
+			context.lineTo(0, origin + thickness);
+			context.closePath();
+			this.fillStroke();
+		},
+		alpha: 0,
+		fill:"#FFDF64",
+		stroke: "black",
+		strokeWidth: 1
+	});
+}
+    </script>
+</head>
+<body onmousedown="return false;">
+    <div id="container">
+    </div>
+</body>
