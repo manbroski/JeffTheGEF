@@ -76,7 +76,7 @@ function main () {
 
 	stage.add (message_layer);
 
-	write_message(message_layer, "Welcome to the GPCR tutorial. Your task is to produce a single cAMP molecule. Here, you see a receptor and effector molecules. Start by attaching the yellow ligand to the GPCR.");
+	write_message(message_layer, "Welcome to the GPCR tutorial. Your task is to produce a single cAMP molecule. Here, you see receptor and effector molecules. Start by attaching the yellow ligand to the GPCR.");
 
 	//interactivity
 	ligand.shape.on("dragend", function () {
@@ -887,7 +887,7 @@ function cyclic_amp (x, y, r) {
 	this.shape.add(outer_lining);
 	this.shape.add(fill);
 	this.shape.add(inner_lining);
-	this.shape.draggable(true);
+	//this.shape.draggable(true);
 }
 
 function write_message(message_layer, message) {
