@@ -37,7 +37,7 @@ function main () {
 	var GEF_cover = new Kinetic.Rect ({x:49,y:399,width:52,height:52,fill:"white"});
 	var effector = new adenyl_cyclase (400,225,50,50,"red");
 	var atp = new adenosine_tp (500,300,15);
-	var atp_cover = new Kinetic.Rect ({x:499,y:299,width:52,height:52});
+	var atp_cover = new Kinetic.Rect ({x:499,y:299,width:52,height:52,fill:"white"});
 	var camp = new cyclic_amp (445,270,15);
 	camp.shape.setAlpha(0);
 
