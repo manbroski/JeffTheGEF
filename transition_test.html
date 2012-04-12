@@ -1,5 +1,5 @@
 <head>
-    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v3.9.2.js">
+    <script src="kinetic.js">
     </script>
     <script>
         window.onload = function() {
@@ -9,18 +9,8 @@
                 height: 200
             });
             var layer = new Kinetic.Layer();
-            var rect = new Kinetic.Rect({
-                x: 100,
-                y: 100,
-                width: 100,
-                height: 50,
-                fill: 'green',
-                stroke: 'black',
-                strokeWidth: 2,
-                alpha: 0.2
-            });
- 
-            layer.add(rect);
+            var receptor = new barrel_protein(100,250,60,60,"red");
+            layer.add(receptor);
             stage.add(layer);
  
             /*
@@ -28,35 +18,44 @@
              * transition
              */
             setTimeout(function() {
-                rect.transitionTo({
-                    x: 400,
-                    y: 30,
-                    rotation: Math.PI * 2,
+                receptor.shape.transitionTo({
                     alpha: 1,
-                    strokeWidth: 6,
-                    scale: {
-                        x: 1.3,
-                        y: 1.3
-                    },
                     duration: 1,
                 });
             }, 1000);
         
 		};
-function rect_bilayer(origin, thickness, curvature) {
-	return new Kinetic.Shape({
+
+function barrel_protein (x, y, width, height, color) {
+	
+	var	curvature = 20;
+	var r = width/2;
+	var ligand_radius = 20;
+	var alpha_radius = 30;
+	var alpha_bs = 12;
+
+	this.shape = new Kinetic.Shape({
 		drawFunc: function() {
 			var context = this.getContext();
+			
+			//draw
 			context.beginPath();
-			context.moveTo(0, origin);
-			context.lineTo(canvasWidth,origin);
-			context.lineTo(canvasWidth, origin + thickness);
-			context.lineTo(0, origin + thickness);
+			context.moveTo(x, y);
+			context.arc(x + r, y, r, Math.PI, Math.PI * 4/3,false);
+			context.lineTo(x + r/2, y - r/3);
+			context.lineTo(x + width - r/2, y - r/3);
+			context.arc(x + r, y, r, Math.PI* 5/3, 0, false);
+			context.lineTo(x + width, y + height);
+			context.arc(x + r, y + height, r, 0, Math.PI * 1/6,false); 
+			context.lineTo(x + width - r/2, y + height + r/2);
+			context.arc(x + r, y + height, r, Math.PI*1/3,Math.PI, false);
 			context.closePath();
+			
 			this.fillStroke();
 		},
-		fill:"#FFDF64",
-		stroke: "black",
+		
+		fill:color,
+		stoke: "black",
 		strokeWidth: 1
 	});
 }

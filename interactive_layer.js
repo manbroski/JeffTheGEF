@@ -130,11 +130,15 @@ function main() {
 	});
 
 		guanosine_triphosphate.group.on("dragend", function () {
-			x = guanosine_triphosphate.group.x + 45;
-			y = guanosine_triphosphate.group.y;
-			//console.log(guanosine_triphosphate.base);
-			//console.log(trimer.alpha.gtp_binding_site);
-			if (inside(guanosine_triphosphate.base, trimer.alpha.gtp_binding_site)) {
+			gtp_x = guanosine_triphosphate.base.protein.x;
+			gtp_y = guanosine_triphosphate.base.protein.y;
+			rec_x = trimer.alpha.gtp_binding_site.x;
+			rec_y = trimer.alpha.gtp_binding_site.y;
+
+			console.log(gtp_x + "; " + gtp_y);
+			console.log(rec_x + "; " + rec_y);
+
+			if (inside(guanosine_triphosphate.base.protein, trimer.alpha.gtp_binding_site)) {
 				console.log("Success");
 			}
 			//if (x < )
@@ -148,7 +152,7 @@ function main() {
 			glucose.x += animationIncrement;
 			ligandBox.x += animationIncrement;*/
 			gpcr.fill = "red";
-			//writeMessage(messageLayer,"Now put that blue g-protein into the binding site!");	
+			//writeMessage(messageLayer,"Now put that blue g-protein into the binding site!");	/rect_bi
 		}
 		if (pathwaySteps["g-protein attachment"]) {
 			//log("hello from chicago!");	
@@ -319,7 +323,7 @@ function alpha_subunit (x, y, r, color) {
 		y: y + 2*r - gbs,
 		width: 20,
 		height: 20,
-		//fill: "blue",
+		fill: "blue",
 	});
 	var font_size = 20;	
 	var title = new Kinetic.Text({
